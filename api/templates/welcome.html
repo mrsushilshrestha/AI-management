@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Welcome - AI Management System</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    body {
+      background: #f0f2f5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .container {
+      margin-top: 60px;
+      flex-grow: 1;
+    }
+    footer {
+      background: #343a40;
+      color: #fff;
+      padding: 10px 0;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container text-center">
+    <h1 class="mb-4">Welcome to AI Management System</h1>
+
+    <!-- Authentication buttons -->
+    {% if user.is_authenticated %}
+      <p class="lead">Hello, <strong>{{ user.username }}</strong>!</p>
+    {% else %}
+      <div class="mb-4">
+        <a href="{% url 'login' %}" class="btn btn-primary me-2">Login</a>
+        <a href="{% url 'register' %}" class="btn btn-outline-primary">Register</a>
+      </div>
+    {% endif %}
+
+    <!-- Prompt actions -->
+    <div class="mb-4">
+      {% if user.is_authenticated %}
+        <a href="{% url 'prompt_form' %}" class="btn btn-success me-2">Submit New Prompt</a>
+        <a href="{% url 'prompt_list' %}" class="btn btn-info">View Your Prompts</a>
+      {% else %}
+        <p><em>Login to submit and view your prompts</em></p>
+      {% endif %}
+    </div>
+
+    <!-- AI Models list -->
+    <h3 class="mb-3">Available AI Models</h3>
+    {% if ai_models %}
+      <ul class="list-group w-50 mx-auto">
+        {% for model in ai_models %}
+          <li class="list-group-item">{{ model.name }}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No AI models available yet.</p>
+    {% endif %}
+  </div>
+
+  <footer>
+    <small>© 2025 AI Management System</small>
+  </footer>
+</body>
+</html>

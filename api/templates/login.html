@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="container mt-5">
+    <h2>User Login</h2>
+    <form id="loginForm">
+        {% csrf_token %}
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+        <input type="email" id="email" class="form-control my-2" placeholder="Email" required>
+        <input type="password" id="password" class="form-control my-2" placeholder="Password" required>
+        <button type="submit" class="btn btn-success">Login</button>
+    </form>
+    <div id="loginResult" class="mt-3"></div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const data = {
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+            };
+
+            // Get CSRF token from the cookie
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            
+            const res = await fetch('/login/', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify(data),
+            });
+
+            const result = await res.json();
+            const resultDiv = document.getElementById('loginResult');
+            
+            if (res.ok) {
+                localStorage.setItem('token', result.token);
+                resultDiv.innerHTML = `<div class="alert alert-success" role="alert">${result.message}</div>`;
+                // Redirect to dashboard after successful login
+                setTimeout(() => {
+                    window.location.href = '/dashboard';
+                }, 1500);
+            } else {
+                // Show validation errors
+                let errorsHtml = '<div class="alert alert-danger"><ul>';
+                if (result.error) {
+                    errorsHtml += `<li>${result.error}</li>`;
+                } else {
+                    for (const [field, messages] of Object.entries(result)) {
+                        messages.forEach((msg) => {
+                            errorsHtml += `<li><strong>${field}:</strong> ${msg}</li>`;
+                        });
+                    }
+                }
+                errorsHtml += '</ul></div>';
+                resultDiv.innerHTML = errorsHtml;
+            }
+        });
+    </script>
+</body>
+</html>
